@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finger ID</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+        }
+
+        .presentation-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            width: 85%;
+            max-width: 1200px;
+            height: 80vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 60px;
+            animation: slideIn 0.5s ease-out;
+            position: relative;
+            overflow: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide h1 {
+            font-size: 3.5em;
+            color: #667eea;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide h2 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .slide p {
+            font-size: 1.3em;
+            line-height: 1.8;
+            color: #555;
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .slide ul {
+            font-size: 1.3em;
+            line-height: 2;
+            color: #555;
+            list-style: none;
+            max-width: 700px;
+        }
+
+        .slide li {
+            margin: 15px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .slide li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .btn {
+            background: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            background: #667eea;
+            color: white;
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            background: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #667eea;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            font-size: 1.1em;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .fullscreen-btn {
+            position: fixed;
+            top: 30px;
+            left: 40px;
+            background: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            color: #667eea;
+        }
+
+        .fullscreen-btn:hover {
+            transform: scale(1.05);
+            background: #667eea;
+            color: white;
+        }
+
+        .slide-title-small {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 25px;
+        }
+
+        .content-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            width: 100%;
+            max-width: 800px;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="slide-counter" id="counter">1 / 5</div>
+
+    <div class="presentation-container">
+        <div class="slide active">
+            <h1>Finger ID</h1>
+            <p>Dilan Aldana</p>
+            <p style="margin-top: 30px; color: #764ba2; font-style: italic;">Sistemas de informacion</p>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title-small">Planeamiento del problema</h2>
+            <div class="content-box">
+                <p>En la actualidad, las sedes de la Universidad de Cundinamarca requieren
+                        sistemas de seguridad cada vez más confiables para tener un mayor control en el
+                        ingreso a la sede. Esto, debido a que los métodos tradicionales como el uso de
+                        contraseñas, tarjetas físicas, etc; pueden ser fácilmente clonados, olvidados o
+                        incluso robados.
+</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title-small">Justificación</h2>
+            <div class="content-box">
+                <p>El sistema de huella digital fortalecerá la seguridad del campus, evitando
+                     ingresos no autorizados, actos de vandalismo y pérdidas materiales. 
+                     También promoverá la modernización tecnológica y un entorno universitario más seguro.
+</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title-small">Objetivo general</h2>
+            <div class="content-box">
+                <p>Desarrollar un software eficiente, intuitivo y de fácil uso que facilite la 
+                    implementación del sistema de identificación biométrica mediante huellas 
+                    dactilares para el control de acceso en la Universidad.
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title-small">Objetivos especificos</h2>
+            <ul>
+                <li>Desarrollar un aplicativo web que permite habilitar o denegar el ingreso a 
+                        través de un lector de huella </li>
+                <li>Mejorar el control de ingresos en la sede</li>
+                <li>Implementar un sistema de seguridad más eficaz</li>
+                <li>Evaluar la usabilidad y desempeño del sistema desarrollado, mediante 
+                        pruebas funcionales y de seguridad que aseguren su correcta operación en 
+                        el entorno universitario. </li>
+                <li>Diseñar una interfaz gráfica amigable e intuitiva, que facilite la interacción 
+                        de los usuarios con el sistema, reduciendo errores y mejorando la 
+                        experiencia de uso.</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title-small">Alcance del proyecto</h2>
+            <div class="content-box">
+                <p>Este software integrará un lector biometrico especializado con una aplicació web
+                    y una base de datos local, permitiendo registrar, validar y administrar
+                    usuarios de forma segura y eficiente.
+            </div>
+        </div>
+
+         <div class="slide">
+            <h2 class="slide-title-small">Beneficiados</h2>
+            <ul>
+                <li>Estudiantes </li>
+                <li>Docentes</li>
+                <li>Personal General</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title-small">Impacto</h2>
+            <div class="content-box">
+                <p>El sistema mejorará la seguridad, la eficiencia administrativa y la productividad 
+                    del personal, evitando pérdidas y vandalismo.
+            </div>
+        </div>
+
+         <div class="slide">
+            <h2 class="slide-title-small">Restricciones</h2>
+            <ul>
+                <li>No incluye integración con otros sistemas institucionales (asistencia académica, 
+                    etc.), aunque se deja preparado para futuras ampliaciones. </li>
+                <li>No contempla el desarrollo de una aplicación móvil; el gestionamiento será 
+                    únicamente vía aplicación web. </li>
+                <li>No se realizará la gestión avanzada de reportes estadísticos ni paneles de control, 
+                    más allá de los registros básicos de usuarios y accesos.</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title-small">Riesgos</h2>
+            <ul>
+                <li>Complicaciones en el sensor </li>
+                <li>Obstruccion del sensor por problemas climaticos (Humedad, polvo, etc) </li>
+                <li>Inconvenientes en la huella del ususario</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title-small">Productos o resultados</h2>
+            <div class="content-box">
+                <p>XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+            </div>
+        </div>
+
+        <div class="slide">
+            <img src="Cronograma-FingerID.png"  style="max-width: 700px; width: 100%; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin: 20px 0;">
+            </p>
+        </div>
+
+        <div class="slide">
+            <h2 class="slide-title-small">💡 Contenido Principal</h2>
+            <div class="content-box">
+                <p>Aquí puedes desarrollar tus ideas principales. El diseño se adapta automáticamente para mantener el contenido centrado y legible.</p>
+            </div>
+            <p style="margin-top: 30px;">Personaliza cada diapositiva según tus necesidades.</p>
+        </div>
+
+        <div class="slide">
+            <h1>🎉 ¡Gracias!</h1>
+            <p>Esta es la última diapositiva. Puedes volver al inicio o cerrar la presentación.</p>
+            <p style="margin-top: 30px; font-size: 1.1em; color: #764ba2;">¿Preguntas?</p>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="previousSlide()">◄ Anterior</button>
+        <button class="btn" onclick="nextSlide()">Siguiente ►</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            document.getElementById('counter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                previousSlide();
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullscreen();
+            }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>
